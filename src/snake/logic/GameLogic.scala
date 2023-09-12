@@ -11,16 +11,61 @@ import snake.logic.GameLogic._
 class GameLogic(val random: RandomGenerator,
                 val gridDims : Dimensions) {
 
+  var up: Boolean = false
+
+ /* def directionBools() = {
+    var up: Boolean = false
+    var down: Boolean = false
+    var left: Boolean = false
+    var right: Boolean = false
+}*/
+
+  case class DirectionBools(var up: Boolean = false, var down: Boolean = false, var left: Boolean = false, var right: Boolean = false)
+  {
+    sealed trait Direction
+    case class North() extends Direction
+    case class South() extends Direction
+    case class West() extends Direction
+    case class East() extends Direction
+  }
+
+
   def gameOver: Boolean = false
 
   // TODO implement me
   def step(): Unit = ()
 
   // TODO implement me
-  def changeDir(d: Direction): Unit = ()
+  var directionFlag: DirectionBools = DirectionBools()
+  def changeDir(d: Direction): Unit = {
+    //test = true
+
+    d match
+    {
+      case North() =>
+        directionFlag.up = true
+
+      case South() =>
+        directionFlag.down = true
+
+      case West() =>
+        directionFlag.left = true
+
+      case East() =>
+        directionFlag.right = true
+    }
+
 
   // TODO implement me
-  def getCellType(p : Point): CellType = Empty()
+  def getCellType(p : Point): CellType = {
+    if(directionFlag.up)
+      {return SnakeHead(North())}
+    else if(directionFlag.left)
+      return SnakeHead(West())
+    else
+      return SnakeHead(South())
+  }
+
 
   // TODO implement me
   def setReverse(r: Boolean): Unit = ()
