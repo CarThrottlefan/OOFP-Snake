@@ -11,7 +11,12 @@ import snake.logic.GameLogic._
 class GameLogic(val random: RandomGenerator,
                 val gridDims : Dimensions) {
 
-  var up: Boolean = false
+  var directionChange = false
+  var x : Int = 5
+  var y : Int = 3
+
+  var snakeHeadPos : Point = Point(x, y)
+  var snakeHeadDir : Direction = East()
 
   case class DirectionBools(var up: Boolean = false, var down: Boolean = false, var left: Boolean = false, var right: Boolean = false)
   {
@@ -20,18 +25,52 @@ class GameLogic(val random: RandomGenerator,
     case class South() extends Direction
     case class West() extends Direction
     case class East() extends Direction
+
+    directionChange = true
+
+    def resetDirFlags() : Unit = {
+      up = false
+      down = false
+      left = false
+      right = false
+    }
   }
 
 
   def gameOver: Boolean = false
 
   // TODO implement me
-  def step(): Unit = ()
-
-  // TODO implement me
   var directionFlag: DirectionBools = DirectionBools()
+  def step(): Unit = {
+
+    if(directionFlag.down)
+      {
+        //directionFlag.resetDirFlags()
+        y += 1
+        snakeHeadPos = Point(x,y)
+      }
+    if (directionFlag.up) {
+      //directionFlag.resetDirFlags()
+      y -= 1
+      snakeHeadPos = Point(x, y)
+    }
+    if (directionFlag.left) {
+      //directionFlag.resetDirFlags()
+      x -= 1
+      snakeHeadPos = Point(x, y)
+    }
+    if (directionFlag.right) {
+      //directionFlag.resetDirFlags()
+      x += 1
+      snakeHeadPos = Point(x, y)
+    }
+
+    //directionFlag.resetDirFlags() - only if i want to move it once per press
+  }
+
   def changeDir(d: Direction): Unit = {
     //test = true
+    snakeHeadDir = d
 
     d match
     {
@@ -51,13 +90,32 @@ class GameLogic(val random: RandomGenerator,
 
   // TODO implement me
   def getCellType(p : Point): CellType = {
-    if(directionFlag.up)
-      {return SnakeHead(North())}
-    else if(directionFlag.left)
+
+    if(p == snakeHeadPos)
+      {
+        return SnakeHead(snakeHeadDir)
+      }
+
+    /*if(directionFlag.up) {
+      //directionFlag.resetDirFlags()
+      return SnakeHead(North())
+    }
+    else if(directionFlag.left) {
+      //directionFlag.resetDirFlags()
       return SnakeHead(West())
-    else
+    }
+    else if(directionFlag.right) {
+      //directionFlag.resetDirFlags()
+      return SnakeHead(East())
+    }
+    //directionFlag.resetDirFlags()
+    else if(directionFlag.up) {
       return SnakeHead(South())
+    }*/
+    else
+      return Empty()
   }
+
 
 
   // TODO implement me
