@@ -8,19 +8,12 @@ import snake.logic.GameLogic._
  * If you need additional files,
  * please also put them in the ``snake`` package.
  */
+
+//For reverse: When you play normally, save curr game save on stack then when press reverse just pop from stack
+
+
 class GameLogic(val random: RandomGenerator,
                 val gridDims : Dimensions) {
-
-  var directionChange = false
-  var x : Int = 5
-  var y : Int = 3
-
-  var prevX : Int = x
-  var prevY : Int = y
-
-  var snakeHeadPos : Point = Point(x, y)
-  var snakeHeadDir : Direction = East()
-
   case class DirectionBools(var up: Boolean = false, var down: Boolean = false, var left: Boolean = false, var right: Boolean = false)
   {
     sealed trait Direction
@@ -28,8 +21,6 @@ class GameLogic(val random: RandomGenerator,
     case class South() extends Direction
     case class West() extends Direction
     case class East() extends Direction
-
-    directionChange = true
 
     def resetDirFlags() : Unit = {
       up = false
@@ -39,48 +30,57 @@ class GameLogic(val random: RandomGenerator,
     }
   }
 
+  var directionFlag: DirectionBools = DirectionBools()
+  def initializeGame(): (Int, Int) = {
+    val x : Int = 2
+    val y : Int = 0
+
+    directionFlag.right = true
+    (x,y)
+  }
+
+  var (x,y) = initializeGame()
+
+
+  var snakeHeadPos : Point = Point(x, y)
+  var snakeHeadDir : Direction = East()
+
+
 
   def gameOver: Boolean = false
 
   // TODO implement me
-  var directionFlag: DirectionBools = DirectionBools()
+
+
   def step(): Unit = {
-    //directionFlag.resetDirFlags()
+
+    if(x >= gridDims.width)
+      x = 0
+    if(y >= gridDims.height)
+      y = 0
+    if(x < 0)
+      x = gridDims.width
+    if(y < 0)
+      y = gridDims.height
+
     if(directionFlag.down)
       {
-        //directionFlag.resetDirFlags()
-        //directionFlag.down = true
-        //x = prevX
-        //y = prevY
-
         y += 1
-
-        prevY = y
         snakeHeadPos = Point(x,y)
       }
     else if (directionFlag.up) {
-      //directionFlag.resetDirFlags()
       y -= 1
       snakeHeadPos = Point(x, y)
     }
     else if (directionFlag.left) {
-      //directionFlag.resetDirFlags()
       x -= 1
       snakeHeadPos = Point(x, y)
     }
     if (directionFlag.right) {
-      //directionFlag.resetDirFlags()
-      //directionFlag.right = true
-      //x = prevX
-      //y = prevY
-
       x += 1
-
-      prevX = x
       snakeHeadPos = Point(x, y)
     }
 
-    //directionFlag.resetDirFlags() - only if i want to move it once per press
   }
 
   def changeDir(d: Direction): Unit = {
