@@ -13,13 +13,6 @@ class GameLogic(val random: RandomGenerator,
 
   var up: Boolean = false
 
- /* def directionBools() = {
-    var up: Boolean = false
-    var down: Boolean = false
-    var left: Boolean = false
-    var right: Boolean = false
-}*/
-
   case class DirectionBools(var up: Boolean = false, var down: Boolean = false, var left: Boolean = false, var right: Boolean = false)
   {
     sealed trait Direction
@@ -54,7 +47,7 @@ class GameLogic(val random: RandomGenerator,
       case East() =>
         directionFlag.right = true
     }
-
+  }
 
   // TODO implement me
   def getCellType(p : Point): CellType = {
