@@ -15,6 +15,9 @@ class GameLogic(val random: RandomGenerator,
   var x : Int = 5
   var y : Int = 3
 
+  var prevX : Int = x
+  var prevY : Int = y
+
   var snakeHeadPos : Point = Point(x, y)
   var snakeHeadDir : Direction = East()
 
@@ -42,26 +45,38 @@ class GameLogic(val random: RandomGenerator,
   // TODO implement me
   var directionFlag: DirectionBools = DirectionBools()
   def step(): Unit = {
-
+    //directionFlag.resetDirFlags()
     if(directionFlag.down)
       {
         //directionFlag.resetDirFlags()
+        //directionFlag.down = true
+        //x = prevX
+        //y = prevY
+
         y += 1
+
+        prevY = y
         snakeHeadPos = Point(x,y)
       }
-    if (directionFlag.up) {
+    else if (directionFlag.up) {
       //directionFlag.resetDirFlags()
       y -= 1
       snakeHeadPos = Point(x, y)
     }
-    if (directionFlag.left) {
+    else if (directionFlag.left) {
       //directionFlag.resetDirFlags()
       x -= 1
       snakeHeadPos = Point(x, y)
     }
     if (directionFlag.right) {
       //directionFlag.resetDirFlags()
+      //directionFlag.right = true
+      //x = prevX
+      //y = prevY
+
       x += 1
+
+      prevX = x
       snakeHeadPos = Point(x, y)
     }
 
@@ -75,15 +90,19 @@ class GameLogic(val random: RandomGenerator,
     d match
     {
       case North() =>
+        directionFlag.resetDirFlags()
         directionFlag.up = true
 
       case South() =>
+        directionFlag.resetDirFlags()
         directionFlag.down = true
 
       case West() =>
+        directionFlag.resetDirFlags()
         directionFlag.left = true
 
       case East() =>
+        directionFlag.resetDirFlags()
         directionFlag.right = true
     }
   }
