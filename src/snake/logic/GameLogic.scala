@@ -61,46 +61,30 @@ class GameLogic(val random: RandomGenerator,
     {
       y += 1
       snakeHeadPos = Point(x,y)
-
-      //snakeBodyPos(0) = snakeHeadPos
-      for(i <- 1 until snakeBodyPos.length) {
-        snakeBodyPos(i) = snakeBodyPos(i - 1)
-      }
-
     }
     else if (directionFlag.up)
     {
       y -= 1
       snakeHeadPos = Point(x, y)
-
-      //snakeBodyPos(0) = snakeHeadPos
-
-      for (i <- 1 until snakeBodyPos.length) {
-        snakeBodyPos(i) = snakeBodyPos(i - 1)
-      }
     }
     else if (directionFlag.left)
     {
       x -= 1
       snakeHeadPos = Point(x, y)
-
-      //snakeBodyPos(0) = snakeHeadPos
-
-      for (i <- 1 until snakeBodyPos.length) {
-        snakeBodyPos(i) = snakeBodyPos(i - 1)
-      }
     }
     else if (directionFlag.right)
     {
       x += 1
       snakeHeadPos = Point(x, y)
-
-      //snakeBodyPos(0) = snakeHeadPos
-
-      for (i <- 1 until snakeBodyPos.length) {
-        snakeBodyPos(i) = snakeBodyPos(i - 1)
-      }
     }
+
+    // Updates the snake body positions
+    for (i <- (1 until snakeBodyPos.length).reverse) {
+      snakeBodyPos(i) = snakeBodyPos(i - 1)
+    }
+
+    // Updates the first element of the snake body to follow the head
+    snakeBodyPos(0) = snakeHeadPos
 
     if(x >= gridDims.width)
       x = 0
@@ -178,7 +162,7 @@ class GameLogic(val random: RandomGenerator,
 /** GameLogic companion object */
 object GameLogic {
 
-  val FramesPerSecond: Int = 2 // change this to increase/decrease speed of game
+  val FramesPerSecond: Int = 5 // change this to increase/decrease speed of game
 
   val DrawSizeFactor = 1.0 // increase this to make the game bigger (for high-res screens)
   // or decrease to make game smaller
