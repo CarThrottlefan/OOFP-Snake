@@ -81,8 +81,10 @@ class GameLogic(val random: RandomGenerator,
   var tailHit : Boolean = false
   var appleExists : Boolean = true
   var currApple : Point = appleGenerator()
+  var counter : Int = 0
 
   def step(): Unit = {
+    if (tailHit) return //stops the game moving
 
     if(!(appleExists)){
       currApple = appleGenerator()
@@ -121,10 +123,21 @@ class GameLogic(val random: RandomGenerator,
     }*/
 
     //Updates the snake body positions
-    val tempSnakeCopy : List[Point] = bodyWithHeadSnake.init
-    val newSnakeBodyPos : List[Point] = tempSnakeCopy
-    //val newSnakeBodyPos : List[Point] = snakeHeadPos :: tempSnakeCopy
-    snakeBodyPos = newSnakeBodyPos
+    if(counter == 0)
+    {
+      val tempSnakeCopy : List[Point] = bodyWithHeadSnake.init
+      val newSnakeBodyPos : List[Point] = tempSnakeCopy
+      //val newSnakeBodyPos : List[Point] = snakeHeadPos :: tempSnakeCopy
+      snakeBodyPos = newSnakeBodyPos
+    }
+    else
+    {
+      val newSnakeBodyPos: List[Point] = bodyWithHeadSnake
+      //val newSnakeBodyPos : List[Point] = snakeHeadPos :: tempSnakeCopy
+      snakeBodyPos = newSnakeBodyPos
+      counter -= 1
+    }
+
 
     // Updates the first element of the snake body to follow the head
    // snakeBodyPos(0) = snakeHeadPos
@@ -136,7 +149,7 @@ class GameLogic(val random: RandomGenerator,
       val tailX : Int = snakeBodyPos(listLength).x
       val tailY : Int = snakeBodyPos(listLength).y
 
-      if(directionFlag.up)
+      /*if(directionFlag.up)
       {
         /*snakeBodyPos.append(Point(tailX, tailY + 1))
         snakeBodyPos.append(Point(tailX, tailY + 2))
@@ -174,8 +187,8 @@ class GameLogic(val random: RandomGenerator,
         val newElements: List[Point] = List[Point](Point(tailX + 1, tailY), Point(tailX + 2, tailY), Point(tailX + 3, tailY))
         val newSnakeBodyPos: List[Point] = snakeBodyPos ::: newElements
         snakeBodyPos = newSnakeBodyPos
-      }
-
+      }*/
+      counter = 3
       listLength += 3
     }
 
@@ -195,6 +208,8 @@ class GameLogic(val random: RandomGenerator,
   def changeDir(d: Direction): Unit = {
     //test = true
     snakeHeadDir = d
+
+    if(tailHit) return
 
     d match
     {
