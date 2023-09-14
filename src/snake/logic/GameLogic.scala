@@ -48,6 +48,8 @@ class GameLogic(val random: RandomGenerator,
   var snakeHeadPos : Point = Point(x, y)
   var snakeHeadDir : Direction = East()
 
+  var currApple : Point = Point (3,3)
+
   val snakeBodyPos : ListBuffer[Point] = ListBuffer (snakeHeadPos, Point(1,0), Point(0,0))
 
   def gameOver: Boolean = false
@@ -56,6 +58,8 @@ class GameLogic(val random: RandomGenerator,
 
 
   def step(): Unit = {
+
+    var listLength : Int = snakeBodyPos.length - 1
 
     if(directionFlag.down)
     {
@@ -79,12 +83,24 @@ class GameLogic(val random: RandomGenerator,
     }
 
     // Updates the snake body positions
-    for (i <- (1 until snakeBodyPos.length).reverse) {
+    for (i <- (1 to listLength).reverse) {
       snakeBodyPos(i) = snakeBodyPos(i - 1)
     }
 
     // Updates the first element of the snake body to follow the head
     snakeBodyPos(0) = snakeHeadPos
+
+    if(snakeHeadPos == currApple)
+    {
+      var tailX : Int = snakeBodyPos(listLength - 1).x
+      var tailY : Int = snakeBodyPos(listLength - 1).y
+
+      snakeBodyPos.append(Point(tailX - 1, tailY - 1))
+      snakeBodyPos.append(Point(tailX - 2, tailY - 2))
+      snakeBodyPos.append(Point(tailX - 3, tailY - 3))
+
+      listLength += 3
+    }
 
     if(x >= gridDims.width)
       x = 0
@@ -131,23 +147,10 @@ class GameLogic(val random: RandomGenerator,
       {
         return SnakeBody()
       }
-
-    /*if(directionFlag.up) {
-      //directionFlag.resetDirFlags()
-      return SnakeHead(North())
-    }
-    else if(directionFlag.left) {
-      //directionFlag.resetDirFlags()
-      return SnakeHead(West())
-    }
-    else if(directionFlag.right) {
-      //directionFlag.resetDirFlags()
-      return SnakeHead(East())
-    }
-    //directionFlag.resetDirFlags()
-    else if(directionFlag.up) {
-      return SnakeHead(South())
-    }*/
+    else if(p == currApple)
+      {
+        return Apple()
+      }
     else
       return Empty()
   }
