@@ -2,7 +2,6 @@ package snake.logic
 
 import engine.random.{RandomGenerator, ScalaRandomGen}
 import snake.logic.GameLogic._
-import scala.collection.mutable.ListBuffer // TODO maybe a way without it?
 
 /** To implement Snake, complete the ``TODOs`` below.
  *
@@ -50,18 +49,39 @@ class GameLogic(val random: RandomGenerator,
 
   var currApple : Point = Point (3,3)
 
-  val snakeBodyPos : ListBuffer[Point] = ListBuffer (snakeHeadPos, Point(1,0), Point(0,0))
+  var snakeBodyPos: List[Point] = List[Point](snakeHeadPos, Point(1,0), Point(0,0))
+  //val snakeBodyPos : ListBuffer[Point] = ListBuffer (snakeHeadPos, Point(1,0), Point(0,0))
 
-  def gameOver: Boolean = false
+  def gameOver: Boolean = {
+    tailHit
+  }
+
+  def appleGenerator() : Unit = {
+    //val freeSpotsNum : Int = gridDims.width * gridDims.height - snakeBodyPos.length
+    var freeSpotsNum : Int = 0
+    val applePos : Int = random.randomInt(freeSpotsNum)
+    var freeSpotsList : List[Point] = List[Point]()
+
+    for(i <- 0 until gridDims.height)
+      for(j <- 0 until gridDims.width)
+      {
+        /*if(!(snakeBodyPos.contains(Point(i,j)))){ //make a list of all the empty positions (each index is one point), and then the rand is an index of that
+          freeSpotsList(freeSpotsNum) = Point(i, j)
+          freeSpotsNum += 1
+
+        }*/
+      }
+
+  }
 
   // TODO implement me
 
-
+  var tailHit : Boolean = false
   def step(): Unit = {
 
     var listLength : Int = snakeBodyPos.length - 1
 
-    if(directionFlag.down)
+    if(directionFlag.down) //TODO make it a function?
     {
       y += 1
       snakeHeadPos = Point(x,y)
@@ -83,26 +103,69 @@ class GameLogic(val random: RandomGenerator,
     }
 
     // Updates the snake body positions
-    for (i <- (1 to listLength).reverse) {
-      snakeBodyPos(i) = snakeBodyPos(i - 1)
-    }
+    /*for (i <- (1 to listLength).reverse) {
+      var newSnakeBody : List[Point] = List[Point]()
+      snakeBodyPos(i) = snakeBodyPos(i - 1)*
+    }*/
+
+    //Updates the snake body positions
+    val tempSnakeCopy : List[Point] = snakeBodyPos.init
+    val newSnakeBodyPos : List[Point] = snakeHeadPos :: tempSnakeCopy
+    snakeBodyPos = newSnakeBodyPos
 
     // Updates the first element of the snake body to follow the head
-    snakeBodyPos(0) = snakeHeadPos
+   // snakeBodyPos(0) = snakeHeadPos
 
-    if(snakeHeadPos == currApple)
+    if(snakeHeadPos == currApple) //TODO make it a function
     {
-      var tailX : Int = snakeBodyPos(listLength - 1).x
-      var tailY : Int = snakeBodyPos(listLength - 1).y
+      val tailX : Int = snakeBodyPos(listLength).x
+      val tailY : Int = snakeBodyPos(listLength).y
 
-      snakeBodyPos.append(Point(tailX - 1, tailY - 1))
-      snakeBodyPos.append(Point(tailX - 2, tailY - 2))
-      snakeBodyPos.append(Point(tailX - 3, tailY - 3))
+
+      if(directionFlag.up)
+      {
+        /*snakeBodyPos.append(Point(tailX, tailY + 1))
+        snakeBodyPos.append(Point(tailX, tailY + 2))
+        snakeBodyPos.append(Point(tailX, tailY + 3))*/
+        //TODO maybe a function to add stuff to a list?
+        val newElements : List[Point] = List[Point] (Point(tailX, tailY + 1), Point(tailX, tailY + 2), Point(tailX, tailY + 3))
+        val newSnakeBodyPos : List[Point] = snakeBodyPos ::: newElements
+        snakeBodyPos = newSnakeBodyPos
+      }
+      else if(directionFlag.down)
+      {
+        /*snakeBodyPos.append(Point(tailX, tailY - 1))
+        snakeBodyPos.append(Point(tailX, tailY - 2))
+        snakeBodyPos.append(Point(tailX, tailY - 3))*/
+
+        val newElements: List[Point] = List[Point](Point(tailX, tailY - 1), Point(tailX, tailY - 2), Point(tailX, tailY - 3))
+        val newSnakeBodyPos: List[Point] = snakeBodyPos ::: newElements
+        snakeBodyPos = newSnakeBodyPos
+      }
+      else if(directionFlag.right)
+      {
+        /*snakeBodyPos.append(Point(tailX - 1, tailY))
+        snakeBodyPos.append(Point(tailX - 2, tailY))
+        snakeBodyPos.append(Point(tailX - 3, tailY))*/
+
+        val newElements: List[Point] = List[Point](Point(tailX - 1, tailY), Point(tailX - 2, tailY), Point(tailX - 3, tailY))
+        val newSnakeBodyPos: List[Point] = snakeBodyPos ::: newElements
+        snakeBodyPos = newSnakeBodyPos
+      }
+      else
+      {
+        /*snakeBodyPos.append(Point(tailX + 1, tailY))
+        snakeBodyPos.append(Point(tailX + 2, tailY))
+        snakeBodyPos.append(Point(tailX + 3, tailY)) */
+        val newElements: List[Point] = List[Point](Point(tailX + 1, tailY), Point(tailX + 2, tailY), Point(tailX + 3, tailY))
+        val newSnakeBodyPos: List[Point] = snakeBodyPos ::: newElements
+        snakeBodyPos = newSnakeBodyPos
+      }
 
       listLength += 3
     }
 
-    if(x >= gridDims.width)
+    if(x >= gridDims.width) //TODO make it a function?
       x = 0
     if(y >= gridDims.height)
       y = 0
@@ -110,6 +173,9 @@ class GameLogic(val random: RandomGenerator,
       x = gridDims.width
     if(y < 0)
       y = gridDims.height
+
+    if(snakeHeadPos == snakeBodyPos(listLength - 1))
+      tailHit = true
   }
 
   def changeDir(d: Direction): Unit = {
@@ -145,7 +211,10 @@ class GameLogic(val random: RandomGenerator,
       }
     else if(snakeBodyPos.contains(p))
       {
-        return SnakeBody()
+        val numOfBodyBlocks : Int = snakeBodyPos.length - 1
+        val colorStep : Float = 1 / numOfBodyBlocks
+
+        return SnakeBody(colorStep * snakeBodyPos.indexOf(p))
       }
     else if(p == currApple)
       {
