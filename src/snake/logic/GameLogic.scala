@@ -107,7 +107,7 @@ class GameLogic(val random: RandomGenerator,
     {
       val tempSnakeCopy : List[Point] = bodyWithHeadSnake.init
       val newSnakeBodyPos : List[Point] = tempSnakeCopy
-      snakeBodyPos = newSnakeBodyPos
+      snakeBodyPos =  newSnakeBodyPos
     }
     else
     {
