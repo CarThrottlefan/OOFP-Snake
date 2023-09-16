@@ -114,43 +114,26 @@ class GameLogic(val random: RandomGenerator,
       counter -= 1
     }
 
-    if(snakeHeadPos == currApple) //TODO make it a function
-    {
+    if(snakeHeadPos == currApple) {
       currApple = appleGenerator()
       counter += 3
     }
 
-    if(x >= gridDims.width) //TODO make it a function?
-      {
+    if(x >= gridDims.width) { //TODO make it a function?
         x = 0
         snakeHeadPos = Point(x,y)
-        val tempSnakeCopy: List[Point] = bodyWithHeadSnake.init
-        val newSnakeBodyPos: List[Point] = tempSnakeCopy
-        snakeBodyPos = newSnakeBodyPos
-      }
-    if(y >= gridDims.height)
-      {
+    }
+    if(y >= gridDims.height) {
         y = 0
         snakeHeadPos = Point(x, y)
-        val tempSnakeCopy: List[Point] = bodyWithHeadSnake.init
-        val newSnakeBodyPos: List[Point] = tempSnakeCopy
-        snakeBodyPos = newSnakeBodyPos
       }
-    if(x < 0)
-      {
+    if(x < 0) {
         x = gridDims.width
         snakeHeadPos = Point(x, y)
-        val tempSnakeCopy: List[Point] = bodyWithHeadSnake.init
-        val newSnakeBodyPos: List[Point] = tempSnakeCopy
-        snakeBodyPos = newSnakeBodyPos
       }
-    if(y < 0)
-      {
+    if(y < 0) {
         y = gridDims.height
         snakeHeadPos = Point(x, y)
-        val tempSnakeCopy: List[Point] = bodyWithHeadSnake.init
-        val newSnakeBodyPos: List[Point] = tempSnakeCopy
-        snakeBodyPos = newSnakeBodyPos
       }
 
     if(snakeBodyPos.contains(snakeHeadPos))
