@@ -9,7 +9,6 @@ import snake.logic.GameLogic._
  * please also put them in the ``snake`` package.
  */
 
-//For reverse: When you play normally, save curr game save on stack then when press reverse just pop from stack
 
 class GameLogic(val random: RandomGenerator,
                 val gridDims : Dimensions) {
@@ -42,7 +41,7 @@ class GameLogic(val random: RandomGenerator,
 
   var snakeHeadPos: Point = Point(2, 0)
   var snakeHeadDir: Direction = East()
-  var snakeBodyPos: List[Point] = List[Point](Point(1,0), Point(0,0))
+  var snakeBodyPos: List[Point] = List[Point](Point(0,0), Point(1,0))
 
   def gameOver: Boolean = {
     tailHit
@@ -77,7 +76,7 @@ class GameLogic(val random: RandomGenerator,
     } //stops the game moving
 
     directionChanged = false
-    val bodyWithHeadSnake : List[Point] = snakeHeadPos :: snakeBodyPos
+    val bodyWithHeadSnake : List[Point] = snakeBodyPos :+ snakeHeadPos
 
     var listLength : Int = snakeBodyPos.length - 1
 
@@ -105,7 +104,7 @@ class GameLogic(val random: RandomGenerator,
     //Updates the snake body positions
     if(counter == 0)
     {
-      val tempSnakeCopy : List[Point] = bodyWithHeadSnake.init
+      val tempSnakeCopy : List[Point] = bodyWithHeadSnake.tail
       val newSnakeBodyPos : List[Point] = tempSnakeCopy
       snakeBodyPos =  newSnakeBodyPos
     }
@@ -232,7 +231,7 @@ object GameLogic {
   // do NOT use DefaultGridDims.width and DefaultGridDims.height
   val DefaultGridDims
     : Dimensions =
-    Dimensions(width = 25, height = 25)  // you can adjust these values to play on a different sized board
+    Dimensions(width = 3, height = 1)  // you can adjust these values to play on a different sized board
 
 
 
