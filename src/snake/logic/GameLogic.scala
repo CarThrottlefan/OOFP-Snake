@@ -79,8 +79,6 @@ class GameLogic(val random: RandomGenerator,
     directionChanged = false
     val bodyWithHeadSnake : List[Point] = snakeHeadPos :: snakeBodyPos
 
-    var listLength : Int = snakeBodyPos.length - 1
-
     if(directionFlag.down) //TODO make it a function?
     {
       y += 1
@@ -119,8 +117,7 @@ class GameLogic(val random: RandomGenerator,
     if(snakeHeadPos == currApple) //TODO make it a function
     {
       currApple = appleGenerator()
-      counter = 3
-      listLength += 3
+      counter += 3
     }
 
     if(x >= gridDims.width) //TODO make it a function?
