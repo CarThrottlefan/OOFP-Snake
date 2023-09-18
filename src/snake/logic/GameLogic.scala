@@ -30,26 +30,33 @@ class GameLogic(val random: RandomGenerator,
   }
 
   var directionFlag: DirectionBools = DirectionBools()
-  def initializeGame(): (Int, Int) = {
+  def initializeGame(): (Point, List[Point], Point) = {
     val x : Int = 2
     val y : Int = 0
 
+    val snakeBody : List[Point] = List[Point](Point(1,0), Point(0,0))
+
+    val snakeHead = Point (x, y)
+
+    val currApple: Point = appleGenerator(snakeBody, snakeHead)
+
     directionFlag.right = true
-    (x,y)
+    var activeGame = new GameState(snakeHead, snakeBody, currApple)
+    (snakeHead, snakeBody, currApple)
   }
 
   //make a var that is the first index to start the list, and whenever a new location is added, just add a new element to the list. Then, when reverse you just move that index back as many steps needed
 
-  var snakeHeadPos: Point = Point(2, 0)
-  var snakeHeadDir: Direction = East()
-  var snakeBodyPos: List[Point] = List[Point](Point(1,0), Point(0,0))
+  //var snakeHeadPos: Point = Point(2, 0)
+ // var snakeHeadDir: Direction = East()
+  //var snakeBodyPos: List[Point] = List[Point](Point(1,0), Point(0,0))
 
   def gameOver: Boolean = {
     tailHit
   }
 
-  def appleGenerator() : Point = {
-    var free_list = gridDims.allPointsInside.filterNot(point=> snakeBodyPos.contains(point) || point == snakeHeadPos)
+  def appleGenerator(snakeBody : List[Point], snakeHead : Point) : Point = {
+    val free_list = gridDims.allPointsInside.filterNot(point => snakeBody.contains(point) || point == snakeHead)
 
     if (free_list.isEmpty){
       return null
@@ -64,41 +71,53 @@ class GameLogic(val random: RandomGenerator,
 
   var counter : Int = 0
 
-  var currApple: Point = appleGenerator()
+  //var currApple: Point = appleGenerator(snakeBodyPos, snakeHeadPos)
 
-  var (x, y) = initializeGame()
-  snakeHeadPos = Point(x, y)
-  snakeHeadDir = East()
-  var directionChanged : Boolean = false
+  //var (x, y) = initializeGame()
+  //snakeHeadPos = Point(x, y)
+  var snakeHeadDir: Direction = East()
+  //var directionChanged : Boolean = false
+
+  var (snakeHeadPos, snakeBodyPos, currApple) = initializeGame()
+
+  def moveSnake(direction: DirectionBools, snakeHead : Point): Point = {
+    val (x,y) = (snakeHead.x, snakeHead.y)
+
+    var snake = snakeHead
+
+    if(direction.right) {
+      val newSnake : Point = Point(x + 1, y)
+      snake = newSnake
+    }
+    else if(direction.left) {
+      val newSnake : Point = Point(x - 1, y)
+      snake = newSnake
+    }
+    else if(direction.up){
+      val newSnake : Point = Point(x, y - 1)
+      snake = newSnake
+    }
+    else if(direction.down){
+      val newSnake : Point = Point(x, y + 1)
+      snake = newSnake
+    }
+    snake
+  }
+
+  /*def getCounter(count : Int) : Unit = {
+
+  }*/
 
   def step(): Unit = {
     if (tailHit){
       return
     } //stops the game moving
 
-    directionChanged = false
+    //directionChanged = false
     val bodyWithHeadSnake : List[Point] = snakeHeadPos :: snakeBodyPos
 
-    if(directionFlag.down) //TODO make it a function?
-    {
-      y += 1
-      snakeHeadPos = Point(x,y)
-    }
-    else if (directionFlag.up)
-    {
-      y -= 1
-      snakeHeadPos = Point(x, y)
-    }
-    else if (directionFlag.left)
-    {
-      x -= 1
-      snakeHeadPos = Point(x, y)
-    }
-    else if (directionFlag.right)
-    {
-      x += 1
-      snakeHeadPos = Point(x, y)
-    }
+    snakeHeadPos = moveSnake(directionFlag, snakeHeadPos)
+    var (x,y) = (snakeHeadPos.x, snakeHeadPos.y)
 
     //Updates the snake body positions
     if(counter == 0)
@@ -116,7 +135,7 @@ class GameLogic(val random: RandomGenerator,
 
     if(snakeHeadPos == currApple) //TODO make it a function
     {
-      currApple = appleGenerator()
+      currApple = appleGenerator(snakeBodyPos, snakeHeadPos)
       counter += 3
     }
 
