@@ -30,9 +30,11 @@ class GameLogic(val random: RandomGenerator,
   }
 
   var directionFlag: DirectionBools = DirectionBools()
-  def initializeGame(): (GameState) = {
+  val currState = new GameState()
+  initializeGame(currState)
 
-    val activeGame = new GameState()
+  def initializeGame(activeGame : GameState): (Unit) = {
+
     val startBody : List[Point] = List[Point] (Point(1,0), Point(0,0))
     activeGame.snakeBody = startBody
 
@@ -41,14 +43,9 @@ class GameLogic(val random: RandomGenerator,
     directionFlag.right = true
     activeGame.apple = currApple
 
-    return activeGame
   }
 
   //make a var that is the first index to start the list, and whenever a new location is added, just add a new element to the list. Then, when reverse you just move that index back as many steps needed
-
-  //var snakeHeadPos: Point = Point(2, 0)
- // var snakeHeadDir: Direction = East()
-  //var snakeBodyPos: List[Point] = List[Point](Point(1,0), Point(0,0))
 
   def gameOver: Boolean = {
     currState.hit
@@ -65,20 +62,6 @@ class GameLogic(val random: RandomGenerator,
     val applePlace : Point = free_list(applePos)
     applePlace
   }
-
-  //var tailHit : Boolean = false
-
-  //var counter : Int = 0
-
-  //var currApple: Point = appleGenerator(snakeBodyPos, snakeHeadPos)
-
-  //var (x, y) = initializeGame()
-  //snakeHeadPos = Point(x, y)
-  //var snakeHeadDir: Direction = East()
-  //var directionChanged : Boolean = false
-
-  //val currState = new GameState()
-  val currState: GameState = initializeGame()
 
   def moveSnake(direction: DirectionBools, snakeHead : Point): Point = {
     val (x,y) = (snakeHead.x, snakeHead.y)
@@ -104,9 +87,32 @@ class GameLogic(val random: RandomGenerator,
     snake
   }
 
-  /*def getCounter(count : Int) : Unit = {
+  def boundaryCheck(snakeHead : Point) : (Point, Boolean) = {
+    var x : Int = snakeHead.x
+    var y : Int = snakeHead.y
 
-  }*/
+    var crossed : Boolean = false
+
+    if(x >= gridDims.width){
+      x = 0
+      crossed = true
+    }
+    else if(y >= gridDims.height){
+      y = 0
+      crossed = true
+    }
+    else if(x < 0){
+      x = gridDims.width
+      crossed = true
+    }
+    else if(y < 0){
+      y = gridDims.height
+      crossed = true
+    }
+    val newSnakeHead : Point = Point(x,y)
+
+    return (newSnakeHead, crossed)
+  }
 
   def step(): Unit = {
 
@@ -114,17 +120,19 @@ class GameLogic(val random: RandomGenerator,
       return
     } //stops the game moving
 
-    //directionChanged = false
-
-
-    //var snakeHead = currState.snakeHead(currState.x,currState.y)
-    //var snakeBody = currState.snakeBody
     val bodyWithHead : List[Point] = currState.currSnakeHead :: currState.snakeBody
 
     currState.currSnakeHead = moveSnake(directionFlag, currState.currSnakeHead)
-    //var (x,y) = (snakeHead.x, snakeHead.y)
+    currState.currSnakeHead = boundaryCheck(currState.currSnakeHead)._1
 
-    //Updates the snake body positions
+    if(boundaryCheck(currState.currSnakeHead)._2)
+    {
+      currState.currSnakeHead = moveSnake(directionFlag, currState.currSnakeHead)
+    }
+
+    currState.x = currState.currSnakeHead.x
+    currState.y = currState.currSnakeHead.y
+
     if(currState.counter == 0)
     {
       val newSnakeBodyPos : List[Point] = bodyWithHead.init
@@ -137,73 +145,49 @@ class GameLogic(val random: RandomGenerator,
       currState.counter -= 1
     }
 
-    if(currState.currSnakeHead == currState.apple) //TODO make it a function
+    if(currState.currSnakeHead == currState.apple)
     {
       currState.apple = appleGenerator(currState.snakeBody, currState.currSnakeHead)
       currState.counter += 3
     }
 
-    if(currState.x >= gridDims.width) //TODO make it a function?
-    {
-      currState.x = 0
-      currState.currSnakeHead = currState.snakeHead(currState.x, currState.y)
-      //val tempSnakeCopy: List[Point] = bodyWithHead.init
-      //val newSnakeBodyPos: List[Point] = tempSnakeCopy
-      //snakeBody = newSnakeBodyPos
-    }
-    if(currState.y >= gridDims.height)
-    {
-      currState.y = 0
-      currState.currSnakeHead = currState.snakeHead(currState.x, currState.y)
-      //val tempSnakeCopy: List[Point] = bodyWithHead.init
-      //val newSnakeBodyPos: List[Point] = tempSnakeCopy
-      //snakeBody = newSnakeBodyPos
-    }
-    if(currState.x < 0)
-    {
-      currState.x = gridDims.width
-      currState.currSnakeHead = currState.snakeHead(currState.x, currState.y)
-      //val tempSnakeCopy: List[Point] = bodyWithHead.init
-      //val newSnakeBodyPos: List[Point] = tempSnakeCopy
-      //snakeBody = newSnakeBodyPos
-    }
-    if(currState.y < 0)
-    {
-      currState.y = gridDims.height
-      currState.currSnakeHead = currState.snakeHead(currState.x, currState.y)
-      //val tempSnakeCopy: List[Point] = bodyWithHead.init
-      //val newSnakeBodyPos: List[Point] = tempSnakeCopy
-      //snakeBody = newSnakeBodyPos
-    }
+    //currState.x = currState.currSnakeHead.x
+    //currState.y = currState.currSnakeHead.y
 
     if(currState.snakeBody.contains(currState.currSnakeHead))
       currState.hit = true
   }
 
   def changeDir(d: Direction): Unit = {
-    currState.snakeHeadDir = d
 
     if(currState.hit) {
       return
     } //doesn't allow for direction change after game over
 
-    d match
+    if(d.opposite != currState.snakeHeadDir)
     {
-      case North() =>
-        directionFlag.resetDirFlags()
-        directionFlag.up = true
+      d match
+      {
+        case North() =>
+          directionFlag.resetDirFlags()
+          directionFlag.up = true
+          currState.snakeHeadDir = North()
 
-      case South() =>
-        directionFlag.resetDirFlags()
-        directionFlag.down = true
+        case South() =>
+          directionFlag.resetDirFlags()
+          directionFlag.down = true
+          currState.snakeHeadDir = South()
 
-      case West() =>
-        directionFlag.resetDirFlags()
-        directionFlag.left = true
+        case West() =>
+          directionFlag.resetDirFlags()
+          directionFlag.left = true
+          currState.snakeHeadDir = West()
 
-      case East() =>
-        directionFlag.resetDirFlags()
-        directionFlag.right = true
+        case East() =>
+          directionFlag.resetDirFlags()
+          directionFlag.right = true
+          currState.snakeHeadDir = East()
+      }
     }
   }
 
