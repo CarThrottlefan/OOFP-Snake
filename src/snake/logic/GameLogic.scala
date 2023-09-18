@@ -30,19 +30,18 @@ class GameLogic(val random: RandomGenerator,
   }
 
   var directionFlag: DirectionBools = DirectionBools()
-  val currState = new GameState()
+  var currState = new GameState()
   initializeGame(currState)
 
-  def initializeGame(activeGame : GameState): (Unit) = {
+  def initializeGame(activeState : GameState): (Unit) = {
 
     val startBody : List[Point] = List[Point] (Point(1,0), Point(0,0))
-    activeGame.snakeBody = startBody
-
-    val currApple: Point = appleGenerator(activeGame.snakeBody, activeGame.snakeHead(activeGame.x, activeGame.y))
-
+    val newState = new GameState(snakeBody = startBody, snakeHead = Point(2,0))
+    val currApple: Point = appleGenerator(newState.snakeBody, newState.snakeHead)
+    val newState2 = new GameState(snakeBody = startBody, apple = currApple, snakeHead = Point(2,0))
+    //activeState.snakeBody = startBody
+    currState = newState2
     directionFlag.right = true
-    activeGame.apple = currApple
-
   }
 
   //make a var that is the first index to start the list, and whenever a new location is added, just add a new element to the list. Then, when reverse you just move that index back as many steps needed
@@ -120,42 +119,74 @@ class GameLogic(val random: RandomGenerator,
       return
     } //stops the game moving
 
-    val bodyWithHead : List[Point] = currState.currSnakeHead :: currState.snakeBody
+    val bodyWithHead : List[Point] = currState.snakeHead :: currState.snakeBody
 
-    currState.currSnakeHead = moveSnake(directionFlag, currState.currSnakeHead)
-    currState.currSnakeHead = boundaryCheck(currState.currSnakeHead)._1
+    val snakeHead : Point = moveSnake(directionFlag, currState.snakeHead)
+    val newGameState = new GameState(snakeBody = currState.snakeBody,
+      snakeHead = snakeHead, apple = currState.apple, counter = currState.counter,
+      hit = currState.hit, snakeHeadDir = currState.snakeHeadDir)
+    var modifiedState = newGameState
+    currState = modifiedState
 
-    if(boundaryCheck(currState.currSnakeHead)._2)
+
+    //currState.currSnakeHead = moveSnake(directionFlag, currState.currSnakeHead)
+
+    var movedSnake : Point = boundaryCheck(currState.snakeHead)._1
+    modifiedState = new GameState(snakeBody = modifiedState.snakeBody, snakeHead = movedSnake,
+      apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
+      snakeHeadDir = modifiedState.snakeHeadDir)
+    currState = modifiedState
+    //currState.snakeHead = boundaryCheck(currState.currSnakeHead)._1
+
+    if(boundaryCheck(currState.snakeHead)._2)
     {
-      currState.currSnakeHead = moveSnake(directionFlag, currState.currSnakeHead)
+      movedSnake = moveSnake(directionFlag, currState.snakeHead)
+      modifiedState = new GameState(snakeBody = modifiedState.snakeBody, snakeHead = movedSnake,
+        apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
+        snakeHeadDir = modifiedState.snakeHeadDir)
+      currState = modifiedState
+      //currState.snakeHead = moveSnake(directionFlag, currState.snakeHead)
     }
 
-    currState.x = currState.currSnakeHead.x
-    currState.y = currState.currSnakeHead.y
 
     if(currState.counter == 0)
     {
-      val newSnakeBodyPos : List[Point] = bodyWithHead.init
-      currState.snakeBody = newSnakeBodyPos
+      val newSnakeBody : List[Point] = bodyWithHead.init
+      modifiedState = new GameState(snakeBody =  newSnakeBody, snakeHead = currState.snakeHead,
+        apple = currState.apple, counter = currState.counter, hit = currState.hit,
+        snakeHeadDir = currState.snakeHeadDir)
+      currState = modifiedState
     }
     else
     {
-      val newSnakeBodyPos: List[Point] = bodyWithHead
-      currState.snakeBody = newSnakeBodyPos
-      currState.counter -= 1
+      val newSnakeBody: List[Point] = bodyWithHead
+      modifiedState = new GameState(snakeBody = newSnakeBody, snakeHead = currState.snakeHead,
+        apple = currState.apple, counter = currState.counter - 1, hit = currState.hit,
+        snakeHeadDir = currState.snakeHeadDir)
+      currState = modifiedState
     }
 
-    if(currState.currSnakeHead == currState.apple)
+    if(currState.snakeHead == currState.apple)
     {
-      currState.apple = appleGenerator(currState.snakeBody, currState.currSnakeHead)
-      currState.counter += 3
+      val currApple = appleGenerator(currState.snakeBody, currState.snakeHead)
+      //currState.apple = appleGenerator(currState.snakeBody, currState.snakeHead)
+      //currState.counter += 3
+      modifiedState = new GameState(snakeBody = currState.snakeBody, snakeHead = currState.snakeHead,
+        apple = currApple, counter = currState.counter + 3, hit = currState.hit,
+        snakeHeadDir = currState.snakeHeadDir)
+      currState = modifiedState
     }
 
     //currState.x = currState.currSnakeHead.x
     //currState.y = currState.currSnakeHead.y
-
-    if(currState.snakeBody.contains(currState.currSnakeHead))
-      currState.hit = true
+    if(currState.snakeBody.contains(currState.snakeHead))
+    {
+      modifiedState = new GameState(snakeBody = currState.snakeBody, snakeHead = currState.snakeHead,
+        apple = currState.apple, counter = currState.counter, hit = true,
+        snakeHeadDir = currState.snakeHeadDir)
+      currState = modifiedState
+    }
+    currState = modifiedState
   }
 
   def changeDir(d: Direction): Unit = {
@@ -171,29 +202,41 @@ class GameLogic(val random: RandomGenerator,
         case North() =>
           directionFlag.resetDirFlags()
           directionFlag.up = true
-          currState.snakeHeadDir = North()
+          val newGameState = new GameState(snakeBody = currState.snakeBody,
+            snakeHead = currState.snakeHead, apple = currState.apple, counter = currState.counter,
+            hit = currState.hit, snakeHeadDir = North())
+          currState = newGameState
 
         case South() =>
           directionFlag.resetDirFlags()
           directionFlag.down = true
-          currState.snakeHeadDir = South()
+          val newGameState = new GameState(snakeBody = currState.snakeBody,
+            snakeHead = currState.snakeHead, apple = currState.apple, counter = currState.counter,
+            hit = currState.hit, snakeHeadDir = South())
+          currState = newGameState
 
         case West() =>
           directionFlag.resetDirFlags()
           directionFlag.left = true
-          currState.snakeHeadDir = West()
+          val newGameState = new GameState(snakeBody = currState.snakeBody,
+            snakeHead = currState.snakeHead, apple = currState.apple, counter = currState.counter,
+            hit = currState.hit, snakeHeadDir = West())
+          currState = newGameState
 
         case East() =>
           directionFlag.resetDirFlags()
           directionFlag.right = true
-          currState.snakeHeadDir = East()
+          val newGameState = new GameState(snakeBody = currState.snakeBody,
+            snakeHead = currState.snakeHead, apple = currState.apple, counter = currState.counter,
+            hit = currState.hit, snakeHeadDir = East())
+          currState = newGameState
       }
     }
   }
 
   def getCellType(p : Point): CellType = {
 
-    if(p == currState.currSnakeHead)
+    if(p == currState.snakeHead)
     {
       return SnakeHead(currState.snakeHeadDir)
     }
@@ -236,7 +279,7 @@ object GameLogic {
   // do NOT use DefaultGridDims.width and DefaultGridDims.height
   val DefaultGridDims
   : Dimensions =
-  Dimensions(width = 4, height = 2)  // you can adjust these values to play on a different sized board
+  Dimensions(width = 4, height = 4)  // you can adjust these values to play on a different sized board
 
 
 
