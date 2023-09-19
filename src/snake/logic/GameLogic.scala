@@ -12,13 +12,13 @@ import snake.logic.GameLogic._
 class GameLogic(val random: RandomGenerator,
                 val gridDims : Dimensions) {
 
-  var currState = GameState()
+  var currState : GameState = GameState()
   var gameStateList : List[GameState] = List[GameState]()
   var reverse : Boolean = false
 
   initializeGame()
 
-  def initializeGame(): (Unit) = {
+  def initializeGame(): Unit = {
     val startBody : List[Point] = List[Point] (Point(1,0), Point(0,0))
     val startHead : Point = Point(2,0)
 
@@ -28,16 +28,14 @@ class GameLogic(val random: RandomGenerator,
     gameStateList = gameStateList :+ currState
   }
 
-  def gameOver: Boolean = {
+  def gameOver(): Boolean = {
     currState.hit
   }
 
   def appleGenerator(snakeBody : List[Point], snakeHead : Point) : Point = {
     val freeList = gridDims.allPointsInside.filterNot(point => snakeBody.contains(point) || point == snakeHead)
 
-    if (freeList.isEmpty){
-      return null
-    }
+    if (freeList.isEmpty) return null
 
     val applePos : Int = random.randomInt(freeList.length)
     val applePlace : Point = freeList(applePos)
@@ -46,22 +44,25 @@ class GameLogic(val random: RandomGenerator,
 
   def moveSnake(d: Direction, snakeHead : Point): Point = {
     val (x,y) = (snakeHead.x, snakeHead.y)
-
     var newSnakeHead = snakeHead
 
-    if(d == East()) {
+    if(d == East())
+    {
       val newSnake : Point = Point(x + 1, y)
       newSnakeHead = newSnake
     }
-    else if(d == West()) {
+    else if(d == West())
+    {
       val newSnake : Point = Point(x - 1, y)
       newSnakeHead = newSnake
     }
-    else if(d == North()){
+    else if(d == North())
+    {
       val newSnake : Point = Point(x, y - 1)
       newSnakeHead = newSnake
     }
-    else if(d == South()){
+    else if(d == South())
+    {
       val newSnake : Point = Point(x, y + 1)
       newSnakeHead = newSnake
     }
@@ -74,19 +75,23 @@ class GameLogic(val random: RandomGenerator,
 
     var crossed : Boolean = false
 
-    if(x >= gridDims.width){
+    if(x >= gridDims.width)
+    {
       x = 0
       crossed = true
     }
-    else if(y >= gridDims.height){
+    else if(y >= gridDims.height)
+    {
       y = 0
       crossed = true
     }
-    else if(x < 0){
+    else if(x < 0)
+    {
       x = gridDims.width
       crossed = true
     }
-    else if(y < 0){
+    else if(y < 0)
+    {
       y = gridDims.height
       crossed = true
     }
@@ -109,9 +114,8 @@ class GameLogic(val random: RandomGenerator,
       }
       return
     }
-    if (currState.hit){
-      return
-    } //stops the game moving
+
+    if (currState.hit) return //stops the game moving
 
     val bodyWithHead : List[Point] = currState.snakeHead :: currState.snakeBody
 
@@ -141,7 +145,6 @@ class GameLogic(val random: RandomGenerator,
     if(currState.snakeHead == currState.apple)
     {
       val currApple = appleGenerator(currState.snakeBody, currState.snakeHead)
-
       currState = currState.copy(apple = currApple, counter = currState.counter + 3)
     }
 
@@ -155,9 +158,10 @@ class GameLogic(val random: RandomGenerator,
   }
 
   def changeDir(d: Direction): Unit = {
-    if(currState.hit) {
+    if(currState.hit) //doesn't allow for direction change after game over
+    {
       return
-    } //doesn't allow for direction change after game over
+    }
 
     if(d != currState.forbiddenDir) // doesn't allow the player to crash into itself
     {
@@ -179,24 +183,19 @@ class GameLogic(val random: RandomGenerator,
   }
 
   def getCellType(p : Point): CellType = {
-
     if(p == currState.snakeHead)
     {
       return SnakeHead(currState.snakeHeadDir)
     }
     else if(currState.snakeBody.contains(p))
     {
-      val numOfBodyBlocks : Int = currState.snakeBody.length
-      val colorStep : Float = 1 / numOfBodyBlocks
-
-      return SnakeBody(colorStep * currState.snakeBody.indexOf(p))
+      return SnakeBody(currState.snakeBody.indexOf(p) / (currState.snakeBody.length - 1).toFloat)
     }
     else if(p == currState.apple)
     {
       return Apple()
     }
-    else
-      return Empty()
+    else return Empty()
   }
 
   def setReverse(r: Boolean): Unit = {
