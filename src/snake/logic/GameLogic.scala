@@ -31,11 +31,10 @@ class GameLogic(val random: RandomGenerator,
 
   var directionFlag: DirectionBools = DirectionBools()
   var currState = new GameState()
-  initializeGame(currState)
-
   var gameStateList : List[GameState] = List[GameState]()
-
   var reverse : Boolean = false
+
+  initializeGame(currState)
 
   def initializeGame(activeState : GameState): (Unit) = {
 
@@ -120,7 +119,24 @@ class GameLogic(val random: RandomGenerator,
   }
 
   def step(): Unit = {
-
+    if(reverse){
+      if(gameStateList.length == 1){
+        currState = gameStateList.head
+      }
+      else{
+        gameStateList = gameStateList.init
+        currState = gameStateList.last
+      }
+      directionFlag.resetDirFlags()
+      currState.snakeHeadDir match
+      {
+        case East() => directionFlag.right = true
+        case West() => directionFlag.left = true
+        case South() => directionFlag.down = true
+        case North() => directionFlag.up = true
+      }
+      return
+    }
     if (currState.hit){
       return
     } //stops the game moving
@@ -133,20 +149,17 @@ class GameLogic(val random: RandomGenerator,
       hit = currState.hit, snakeHeadDir = currState.snakeHeadDir)
     var modifiedState = newGameState
     currState = modifiedState
-    var newGameStateList = gameStateList :+ currState
-    gameStateList = newGameStateList
+    //var newGameStateList = gameStateList :+ currState
+    //gameStateList = newGameStateList
 
     var movedSnake : Point = boundaryCheck(currState.snakeHead)._1
     modifiedState = new GameState(snakeBody = modifiedState.snakeBody, snakeHead = movedSnake,
       apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
       snakeHeadDir = modifiedState.snakeHeadDir)
     currState = modifiedState
-    newGameStateList = gameStateList :+ currState
-    gameStateList = newGameStateList
+    //newGameStateList = gameStateList :+ currState
+    //gameStateList = newGameStateList
 
-    if(reverse){
-      gameStateList = backTrack(gameStateList)
-    }
 
     if(boundaryCheck(currState.snakeHead)._2)
     {
@@ -155,8 +168,8 @@ class GameLogic(val random: RandomGenerator,
         apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
         snakeHeadDir = modifiedState.snakeHeadDir)
       currState = modifiedState
-      newGameStateList = gameStateList :+ currState
-      gameStateList = newGameStateList
+      //newGameStateList = gameStateList :+ currState
+      //gameStateList = newGameStateList
     }
 
     if(currState.counter == 0)
@@ -166,7 +179,7 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      newGameStateList = gameStateList :+ currState
+      val newGameStateList = gameStateList :+ currState
       gameStateList = newGameStateList
     }
     else
@@ -176,7 +189,7 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter - 1, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      newGameStateList = gameStateList :+ currState
+      val newGameStateList = gameStateList :+ currState
       gameStateList = newGameStateList
     }
 
@@ -187,6 +200,8 @@ class GameLogic(val random: RandomGenerator,
         apple = currApple, counter = currState.counter + 3, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
+      val newGameStateList = gameStateList :+ currState
+      gameStateList = newGameStateList
     }
 
     if(currState.snakeBody.contains(currState.snakeHead))
@@ -195,6 +210,8 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter, hit = true,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
+      val newGameStateList = gameStateList :+ currState
+      gameStateList = newGameStateList
     }
     modifiedState = new GameState(snakeBody = currState.snakeBody, snakeHead = currState.snakeHead,
       apple = currState.apple, counter = currState.counter, hit = currState.hit,
@@ -268,14 +285,14 @@ class GameLogic(val random: RandomGenerator,
       return Empty()
   }
 
-  def backTrack(gameStateList : List[GameState]) : List[GameState] = {
+  /*def backTrack(gameStateList : List[GameState]) : List[GameState] = {
     var gameStateListCopy = gameStateList
     while(reverse){
       val newGameStateList = gameStateList.init
       gameStateListCopy = newGameStateList
     }
     return gameStateListCopy
-  }
+  }*/
 
   def setReverse(r: Boolean): Unit = {
     reverse = r
