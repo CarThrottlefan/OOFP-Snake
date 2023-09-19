@@ -11,24 +11,8 @@ import snake.logic.GameLogic._
 
 class GameLogic(val random: RandomGenerator,
                 val gridDims : Dimensions) {
-  case class DirectionBools(var up: Boolean = false, var down: Boolean = false, var left: Boolean = false, var right: Boolean = false)
-  {
-    sealed trait Direction
-    case class North() extends Direction
-    case class South() extends Direction
-    case class West() extends Direction
-    case class East() extends Direction
 
-    def resetDirFlags() : Unit = {
-      up = false
-      down = false
-      left = false
-      right = false
-    }
-  }
-
-  var directionFlag: DirectionBools = DirectionBools()
-  var currState = new GameState()
+  var currState = GameState()
   var gameStateList : List[GameState] = List[GameState]()
   var reverse : Boolean = false
 
@@ -42,7 +26,6 @@ class GameLogic(val random: RandomGenerator,
     currState = currState.copy(snakeBody = startBody, apple = currApple, snakeHead = startHead)
 
     gameStateList = gameStateList :+ currState
-    directionFlag.right = true
   }
 
   def gameOver: Boolean = {
@@ -61,24 +44,24 @@ class GameLogic(val random: RandomGenerator,
     applePlace
   }
 
-  def moveSnake(direction: DirectionBools, snakeHead : Point): Point = {
+  def moveSnake(d: Direction, snakeHead : Point): Point = {
     val (x,y) = (snakeHead.x, snakeHead.y)
 
     var newSnakeHead = snakeHead
 
-    if(direction.right) {
+    if(d == East()) {
       val newSnake : Point = Point(x + 1, y)
       newSnakeHead = newSnake
     }
-    else if(direction.left) {
+    else if(d == West()) {
       val newSnake : Point = Point(x - 1, y)
       newSnakeHead = newSnake
     }
-    else if(direction.up){
+    else if(d == North()){
       val newSnake : Point = Point(x, y - 1)
       newSnakeHead = newSnake
     }
-    else if(direction.down){
+    else if(d == South()){
       val newSnake : Point = Point(x, y + 1)
       newSnakeHead = newSnake
     }
@@ -113,21 +96,16 @@ class GameLogic(val random: RandomGenerator,
   }
 
   def step(): Unit = {
-    if(reverse){
-      if(gameStateList.length == 1){
+    if(reverse)
+    {
+      if(gameStateList.length == 1)
+      {
         currState = gameStateList.head
       }
-      else{
+      else
+      {
         gameStateList = gameStateList.init
         currState = gameStateList.last
-      }
-      directionFlag.resetDirFlags()
-      currState.snakeHeadDir match
-      {
-        case East() => directionFlag.right = true
-        case West() => directionFlag.left = true
-        case South() => directionFlag.down = true
-        case North() => directionFlag.up = true
       }
       return
     }
@@ -137,7 +115,7 @@ class GameLogic(val random: RandomGenerator,
 
     val bodyWithHead : List[Point] = currState.snakeHead :: currState.snakeBody
 
-    val snakeHeadMoved : Point = moveSnake(directionFlag, currState.snakeHead)
+    val snakeHeadMoved : Point = moveSnake(currState.snakeHeadDir, currState.snakeHead)
     currState = currState.copy(snakeHead = snakeHeadMoved)
 
     val snakeHeadOutOfBounds = boundaryCheck(currState.snakeHead)._1
@@ -145,7 +123,7 @@ class GameLogic(val random: RandomGenerator,
 
     if(boundaryCheck(currState.snakeHead)._2)
     {
-      val snakeHeadOutOfBounds = moveSnake(directionFlag, currState.snakeHead)
+      val snakeHeadOutOfBounds = moveSnake(currState.snakeHeadDir, currState.snakeHead)
       currState = currState.copy(snakeHead = snakeHeadOutOfBounds)
     }
 
@@ -181,28 +159,20 @@ class GameLogic(val random: RandomGenerator,
       return
     } //doesn't allow for direction change after game over
 
-    if(d != currState.forbiddenDir)
+    if(d != currState.forbiddenDir) // doesn't allow the player to crash into itself
     {
       d match
       {
         case North() =>
-          directionFlag.resetDirFlags()
-          directionFlag.up = true
           currState = currState.copy(snakeHeadDir = North())
 
         case South() =>
-          directionFlag.resetDirFlags()
-          directionFlag.down = true
           currState = currState.copy(snakeHeadDir = South())
 
         case West() =>
-          directionFlag.resetDirFlags()
-          directionFlag.left = true
           currState = currState.copy(snakeHeadDir = West())
 
         case East() =>
-          directionFlag.resetDirFlags()
-          directionFlag.right = true
           currState = currState.copy(snakeHeadDir = East())
       }
     }
@@ -216,7 +186,7 @@ class GameLogic(val random: RandomGenerator,
     }
     else if(currState.snakeBody.contains(p))
     {
-      val numOfBodyBlocks : Int = currState.snakeBody.length - 1
+      val numOfBodyBlocks : Int = currState.snakeBody.length
       val colorStep : Float = 1 / numOfBodyBlocks
 
       return SnakeBody(colorStep * currState.snakeBody.indexOf(p))
@@ -255,9 +225,4 @@ object GameLogic {
   val DefaultGridDims
   : Dimensions =
   Dimensions(width = 10, height = 10)  // you can adjust these values to play on a different sized board
-
-
-
 }
-
-
