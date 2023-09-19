@@ -143,7 +143,6 @@ class GameLogic(val random: RandomGenerator,
       currState = modifiedState
     }
 
-
     if(currState.counter == 0)
     {
       val newSnakeBody : List[Point] = bodyWithHead.init
