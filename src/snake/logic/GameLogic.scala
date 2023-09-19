@@ -39,10 +39,10 @@ class GameLogic(val random: RandomGenerator,
   def initializeGame(activeState : GameState): (Unit) = {
 
     val startBody : List[Point] = List[Point] (Point(1,0), Point(0,0))
-    val newState = new GameState(snakeBody = startBody, snakeHead = Point(2,0))
-    val currApple: Point = appleGenerator(newState.snakeBody, newState.snakeHead)
-    val newState2 = new GameState(snakeBody = startBody, apple = currApple, snakeHead = Point(2,0))
-    currState = newState2
+    //val newState = new GameState(snakeBody = startBody, snakeHead = Point(2,0))
+    val currApple: Point = appleGenerator(List(Point(1,0), Point(0,0)), Point(2,0))
+    val newState = new GameState(snakeBody = startBody, apple = currApple, snakeHead = Point(2,0))
+    currState = newState
 
     val newGameStateList = gameStateList :+ currState
     gameStateList = newGameStateList
@@ -56,14 +56,14 @@ class GameLogic(val random: RandomGenerator,
   }
 
   def appleGenerator(snakeBody : List[Point], snakeHead : Point) : Point = {
-    val free_list = gridDims.allPointsInside.filterNot(point => snakeBody.contains(point) || point == snakeHead)
+    val freeList = gridDims.allPointsInside.filterNot(point => snakeBody.contains(point) || point == snakeHead)
 
-    if (free_list.isEmpty){
+    if (freeList.isEmpty){
       return null
     }
 
-    val applePos : Int = random.randomInt(free_list.length)
-    val applePlace : Point = free_list(applePos)
+    val applePos : Int = random.randomInt(freeList.length)
+    val applePlace : Point = freeList(applePos)
     applePlace
   }
 
@@ -217,6 +217,7 @@ class GameLogic(val random: RandomGenerator,
       apple = currState.apple, counter = currState.counter, hit = currState.hit,
       snakeHeadDir = currState.snakeHeadDir, forbiddenDir = currState.snakeHeadDir.opposite)
     currState = modifiedState
+
     val newGameStateList = gameStateList :+ currState
     gameStateList = newGameStateList
   }
