@@ -9,8 +9,6 @@ import snake.logic.GameLogic._
  * please also put them in the ``snake`` package.
  */
 
-//For reverse: When you play normally, save curr game save on stack then when press reverse just pop from stack
-
 class GameLogic(val random: RandomGenerator,
                 val gridDims : Dimensions) {
   case class DirectionBools(var up: Boolean = false, var down: Boolean = false, var left: Boolean = false, var right: Boolean = false)
@@ -39,7 +37,6 @@ class GameLogic(val random: RandomGenerator,
   def initializeGame(activeState : GameState): (Unit) = {
 
     val startBody : List[Point] = List[Point] (Point(1,0), Point(0,0))
-    //val newState = new GameState(snakeBody = startBody, snakeHead = Point(2,0))
     val currApple: Point = appleGenerator(List(Point(1,0), Point(0,0)), Point(2,0))
     val newState = new GameState(snakeBody = startBody, apple = currApple, snakeHead = Point(2,0))
     currState = newState
@@ -149,17 +146,12 @@ class GameLogic(val random: RandomGenerator,
       hit = currState.hit, snakeHeadDir = currState.snakeHeadDir)
     var modifiedState = newGameState
     currState = modifiedState
-    //var newGameStateList = gameStateList :+ currState
-    //gameStateList = newGameStateList
 
     var movedSnake : Point = boundaryCheck(currState.snakeHead)._1
     modifiedState = new GameState(snakeBody = modifiedState.snakeBody, snakeHead = movedSnake,
       apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
       snakeHeadDir = modifiedState.snakeHeadDir)
     currState = modifiedState
-    //newGameStateList = gameStateList :+ currState
-    //gameStateList = newGameStateList
-
 
     if(boundaryCheck(currState.snakeHead)._2)
     {
@@ -168,8 +160,6 @@ class GameLogic(val random: RandomGenerator,
         apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
         snakeHeadDir = modifiedState.snakeHeadDir)
       currState = modifiedState
-      //newGameStateList = gameStateList :+ currState
-      //gameStateList = newGameStateList
     }
 
     if(currState.counter == 0)
@@ -179,8 +169,6 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      //val newGameStateList = gameStateList :+ currState
-      //gameStateList = newGameStateList
     }
     else
     {
@@ -189,8 +177,6 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter - 1, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      //val newGameStateList = gameStateList :+ currState
-      //gameStateList = newGameStateList
     }
 
     if(currState.snakeHead == currState.apple)
@@ -200,8 +186,6 @@ class GameLogic(val random: RandomGenerator,
         apple = currApple, counter = currState.counter + 3, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      //val newGameStateList = gameStateList :+ currState
-      //gameStateList = newGameStateList
     }
 
     if(currState.snakeBody.contains(currState.snakeHead))
@@ -210,8 +194,6 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter, hit = true,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      //val newGameStateList = gameStateList :+ currState
-      //gameStateList = newGameStateList
     }
     modifiedState = new GameState(snakeBody = currState.snakeBody, snakeHead = currState.snakeHead,
       apple = currState.apple, counter = currState.counter, hit = currState.hit,
@@ -251,6 +233,7 @@ class GameLogic(val random: RandomGenerator,
         case West() =>
           directionFlag.resetDirFlags()
           directionFlag.left = true
+
           newGameState = new GameState(snakeBody = currState.snakeBody,
             snakeHead = currState.snakeHead, apple = currState.apple, counter = currState.counter,
             hit = currState.hit, snakeHeadDir = West())
@@ -322,7 +305,7 @@ object GameLogic {
   // do NOT use DefaultGridDims.width and DefaultGridDims.height
   val DefaultGridDims
   : Dimensions =
-  Dimensions(width = 25, height = 25)  // you can adjust these values to play on a different sized board
+  Dimensions(width = 10, height = 10)  // you can adjust these values to play on a different sized board
 
 
 
