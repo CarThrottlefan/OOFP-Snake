@@ -256,7 +256,7 @@ class GameLogic(val random: RandomGenerator,
 /** GameLogic companion object */
 object GameLogic {
 
-  val FramesPerSecond: Int = 1 // change this to increase/decrease speed of game
+  val FramesPerSecond: Int = 5 // change this to increase/decrease speed of game
 
   val DrawSizeFactor = 1.0 // increase this to make the game bigger (for high-res screens)
   // or decrease to make game smaller
@@ -273,7 +273,7 @@ object GameLogic {
   // do NOT use DefaultGridDims.width and DefaultGridDims.height
   val DefaultGridDims
   : Dimensions =
-  Dimensions(width = 4, height = 4)  // you can adjust these values to play on a different sized board
+  Dimensions(width = 25, height = 25)  // you can adjust these values to play on a different sized board
 
 
 
