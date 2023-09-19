@@ -33,14 +33,20 @@ class GameLogic(val random: RandomGenerator,
   var currState = new GameState()
   initializeGame(currState)
 
+  var gameStateList : List[GameState] = List[GameState]()
+
+  var reverse : Boolean = false
+
   def initializeGame(activeState : GameState): (Unit) = {
 
     val startBody : List[Point] = List[Point] (Point(1,0), Point(0,0))
     val newState = new GameState(snakeBody = startBody, snakeHead = Point(2,0))
     val currApple: Point = appleGenerator(newState.snakeBody, newState.snakeHead)
     val newState2 = new GameState(snakeBody = startBody, apple = currApple, snakeHead = Point(2,0))
-    //activeState.snakeBody = startBody
     currState = newState2
+
+    val newGameStateList = gameStateList :+ currState
+    gameStateList = newGameStateList
     directionFlag.right = true
   }
 
@@ -127,12 +133,20 @@ class GameLogic(val random: RandomGenerator,
       hit = currState.hit, snakeHeadDir = currState.snakeHeadDir)
     var modifiedState = newGameState
     currState = modifiedState
+    var newGameStateList = gameStateList :+ currState
+    gameStateList = newGameStateList
 
     var movedSnake : Point = boundaryCheck(currState.snakeHead)._1
     modifiedState = new GameState(snakeBody = modifiedState.snakeBody, snakeHead = movedSnake,
       apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
       snakeHeadDir = modifiedState.snakeHeadDir)
     currState = modifiedState
+    newGameStateList = gameStateList :+ currState
+    gameStateList = newGameStateList
+
+    if(reverse){
+      gameStateList = backTrack(gameStateList)
+    }
 
     if(boundaryCheck(currState.snakeHead)._2)
     {
@@ -141,6 +155,8 @@ class GameLogic(val random: RandomGenerator,
         apple = modifiedState.apple, counter = modifiedState.counter, hit = modifiedState.hit,
         snakeHeadDir = modifiedState.snakeHeadDir)
       currState = modifiedState
+      newGameStateList = gameStateList :+ currState
+      gameStateList = newGameStateList
     }
 
     if(currState.counter == 0)
@@ -150,6 +166,8 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
+      newGameStateList = gameStateList :+ currState
+      gameStateList = newGameStateList
     }
     else
     {
@@ -158,6 +176,8 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter - 1, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
+      newGameStateList = gameStateList :+ currState
+      gameStateList = newGameStateList
     }
 
     if(currState.snakeHead == currState.apple)
@@ -248,8 +268,18 @@ class GameLogic(val random: RandomGenerator,
       return Empty()
   }
 
-  def setReverse(r: Boolean): Unit = ()
+  def backTrack(gameStateList : List[GameState]) : List[GameState] = {
+    var gameStateListCopy = gameStateList
+    while(reverse){
+      val newGameStateList = gameStateList.init
+      gameStateListCopy = newGameStateList
+    }
+    return gameStateListCopy
+  }
 
+  def setReverse(r: Boolean): Unit = {
+    reverse = r
+  }
 }
 
 /** GameLogic companion object */
