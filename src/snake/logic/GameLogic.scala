@@ -179,8 +179,8 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      val newGameStateList = gameStateList :+ currState
-      gameStateList = newGameStateList
+      //val newGameStateList = gameStateList :+ currState
+      //gameStateList = newGameStateList
     }
     else
     {
@@ -189,8 +189,8 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter - 1, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      val newGameStateList = gameStateList :+ currState
-      gameStateList = newGameStateList
+      //val newGameStateList = gameStateList :+ currState
+      //gameStateList = newGameStateList
     }
 
     if(currState.snakeHead == currState.apple)
@@ -200,8 +200,8 @@ class GameLogic(val random: RandomGenerator,
         apple = currApple, counter = currState.counter + 3, hit = currState.hit,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      val newGameStateList = gameStateList :+ currState
-      gameStateList = newGameStateList
+      //val newGameStateList = gameStateList :+ currState
+      //gameStateList = newGameStateList
     }
 
     if(currState.snakeBody.contains(currState.snakeHead))
@@ -210,13 +210,15 @@ class GameLogic(val random: RandomGenerator,
         apple = currState.apple, counter = currState.counter, hit = true,
         snakeHeadDir = currState.snakeHeadDir)
       currState = modifiedState
-      val newGameStateList = gameStateList :+ currState
-      gameStateList = newGameStateList
+      //val newGameStateList = gameStateList :+ currState
+      //gameStateList = newGameStateList
     }
     modifiedState = new GameState(snakeBody = currState.snakeBody, snakeHead = currState.snakeHead,
       apple = currState.apple, counter = currState.counter, hit = currState.hit,
       snakeHeadDir = currState.snakeHeadDir, forbiddenDir = currState.snakeHeadDir.opposite)
     currState = modifiedState
+    val newGameStateList = gameStateList :+ currState
+    gameStateList = newGameStateList
   }
 
   def changeDir(d: Direction): Unit = {
